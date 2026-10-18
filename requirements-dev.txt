@@ -1,0 +1,8 @@
+# For running tests outside Docker. Airflow itself runs in Docker.
+pandas>=2.0
+scikit-learn>=1.4
+kneed>=0.8
+matplotlib>=3.8
+pytest>=8.0
+pytest-cov>=5.0
+flake8>=7.0

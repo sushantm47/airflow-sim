@@ -1,0 +1,41 @@
+name: Test segmentation pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint with flake8
+        run: flake8 dags tests --max-line-length=110
+
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=85
+
+      - name: Check DAG file compiles
+        run: python -m py_compile dags/airflow.py
+
+      - name: Notify on success
+        if: success()
+        run: echo "Pipeline tests passed"
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "Pipeline tests failed"

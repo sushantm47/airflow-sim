@@ -1,0 +1,14 @@
+logs/
+plugins/
+config/
+working_data/*
+!working_data/.gitkeep
+dags/model/*
+!dags/model/.gitkeep
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+.venv/
+*.zip
+wholesale_tmp/
