@@ -97,17 +97,55 @@ def test_gate_blocks_single_segment(sweep):
 def test_segments_and_report(sweep, sandbox):
     result = lab.segment_customers("model.sav", 2, sweep)
     out = sandbox / "out"
-    assert result["segments"] == 2
+    assert result["segments"] == 2 and result["opportunity"] > 0
 
     customers = pd.read_csv(out / "customer_segments.csv")
     assert len(customers) == 200 and customers["Segment"].nunique() == 2
+    assert customers["Customer_ID"].tolist() == list(range(1, 201))
 
     profiles = pd.read_csv(out / "segment_profiles.csv")
     assert profiles["Customers"].sum() == 200
     assert set(profiles["Main_Channel"]) == {"Horeca", "Retail"}
+    assert profiles["Revenue_pct"].sum() == pytest.approx(100, abs=0.2)
+    assert profiles["Revenue"].sum() == customers["Annual_Spend"].sum()
+
+    targets = pd.read_csv(out / "promotion_targets.csv")
+    assert (targets["Gap"] > 0).all()
+    assert targets.groupby("Segment").size().max() <= 10
+    assert set(targets["Region"]) <= {"Lisbon", "Oporto", "Other"}
 
     html = (out / "segment_report.html").read_text(encoding="utf-8")
-    assert "Wholesale Customer Segments" in html and html.count("data:image/png") == 2
+    assert "Who to call first" in html and html.count("data:image/png") == 3
+
+
+def test_promotion_targets_are_share_of_wallet_gaps():
+    df = pd.DataFrame({
+        "Customer_ID": [1, 2, 3, 4, 5, 6],
+        "Segment": [0, 0, 0, 0, 1, 1],
+        "Segment_Name": ["A"] * 4 + ["B"] * 2,
+        "Channel": [1, 1, 1, 2, 2, 2],   # customer 4 is a shop inside a restaurant segment
+        "Region": [1, 2, 3, 1, 1, 1],
+        "Fresh": [100, 50, 10, 0, 0, 0],
+        "Grocery": [0, 0, 0, 0, 80, 20],
+    })
+    targets, opportunity = lab.find_promotion_targets(
+        df, {0: "Fresh", 1: "Grocery"}, {0: 1, 1: 2}, top_n=1)
+    # segment 0 peers = restaurants 1-3, median 50 -> customer 3 is 40 below
+    # segment 1 median Grocery = 50 -> customer 6 is 30 below
+    assert targets["Customer_ID"].tolist() == [3, 6]
+    assert targets["Gap"].tolist() == [40, 30]
+    assert 4 not in targets["Customer_ID"].tolist()   # the shop is not compared with restaurants
+    assert opportunity.loc[0, "Opportunity"] == 40 and opportunity.loc[1, "Opportunity"] == 30
+    assert opportunity.loc[0, "Customers_Below_Median"] == 1
+
+
+def test_targets_match_segment_main_channel(sweep, sandbox):
+    lab.segment_customers("model.sav", 2, sweep)
+    out = sandbox / "out"
+    targets = pd.read_csv(out / "promotion_targets.csv")
+    profiles = pd.read_csv(out / "segment_profiles.csv").set_index("Segment")
+    for _, t in targets.iterrows():
+        assert t["Channel"] == profiles.loc[t["Segment"], "Main_Channel"]
 
 
 def test_segment_names_reflect_spending():
