@@ -68,16 +68,17 @@ Run on the full UCI dataset (440 customers, annual revenue 14,619,500 m.u.). The
 
 | Segment | Customers | Revenue share | Avg spend | Signature category | Growth opportunity |
 | --- | --- | --- | --- | --- | --- |
-| Retail: Cleaning & paper + Grocery | 80 (18.2%) | 16.2% | 29,548 | Cleaning & paper | 84,788 |
-| Retail: Deli + Dairy | 147 (33.4%) | **53.2%** | 52,903 | Deli | 61,567 |
-| Horeca: Frozen + Fresh produce | 213 (48.4%) | 30.6% | 21,028 | Frozen | **116,978** |
+| Retail: Cleaning & paper + Grocery | 80 (18.2%) | 16.2% | 29,548 | Cleaning & paper | 57,216 |
+| Retail: Deli + Dairy | 147 (33.4%) | **53.2%** | 52,903 | Deli | 32,855 |
+| Horeca: Frozen + Fresh produce | 213 (48.4%) | 30.6% | 21,028 | Frozen | **114,958** |
 
 **Takeaways for the sales team**
 
 - *Retail: Deli + Dairy* is a third of the customers but more than half of the revenue, so it is the segment to protect.
-- *Horeca: Frozen + Fresh produce* is the largest group but spends the least per customer. 106 of these customers
-  buy less frozen food than is typical for the segment, worth about 117k m.u. a year if they caught up. This is
-  the biggest growth opportunity.
+- *Horeca: Frozen + Fresh produce* is the largest group but spends the least per customer. 105 of these
+  restaurants and cafés buy less frozen food than their peers, worth about 115k m.u. a year if they caught up
+  to the peer median. This is the biggest growth opportunity.
+- Across all segments, the total growth opportunity is about **205k m.u. a year** (1.4% of current revenue).
 - `promotion_targets.csv` lists the specific customers to contact first in each segment.
 
 ### Pipeline run
